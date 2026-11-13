@@ -36,7 +36,10 @@ self.addEventListener("activate", (event) => {
       .then((cacheNames) =>
         Promise.all(
           cacheNames
-            .filter((name) => name.startsWith("midad-global-") && name !== CACHE_NAME)
+            .filter((name) =>
+              name.startsWith("midad-global-") &&
+              name !== CACHE_NAME
+            )
             .map((name) => caches.delete(name))
         )
       )
@@ -56,30 +59,28 @@ self.addEventListener("fetch", (event) => {
   if (requestURL.origin !== self.location.origin) return;
 
   event.respondWith(
-    caches.match(request)
-      .then((cachedResponse) => {
-        if (cachedResponse) return cachedResponse;
+    caches.match(request).then((cachedResponse) => {
+      if (cachedResponse) return cachedResponse;
 
-        return fetch(request).then((response) => {
-          if (
-            !response ||
-            response.status !== 200 ||
-            response.type !== "basic"
-          ) {
-            return response;
-          }
-
-          const responseCopy = response.clone();
-
-          event.waitUntil(
-            caches.open(CACHE_NAME)
-              .then((cache) => cache.put(request, responseCopy))
-          );
-
+      return fetch(request).then((response) => {
+        if (
+          !response ||
+          response.status !== 200 ||
+          response.type !== "basic"
+        ) {
           return response;
-        });
-      })
-      .catch(() => {
+        }
+
+        const responseCopy = response.clone();
+
+        event.waitUntil(
+          caches.open(CACHE_NAME)
+            .then((cache) => cache.put(request, responseCopy))
+        );
+
+        return response;
+
+      }).catch(() => {
         if (request.mode === "navigate") {
           return caches.match("./index.html");
         }
@@ -90,6 +91,7 @@ self.addEventListener("fetch", (event) => {
             "Content-Type": "text/plain; charset=utf-8"
           }
         });
-      })
+      });
+    })
   );
 });
