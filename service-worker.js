@@ -1,82 +1,95 @@
 
 "use strict";
 
-const CACHE_NAME = "midad-global-v2";
+/* ==========================================
+   MIDAD GLOBAL HUB
+   ADVANCED SERVICE WORKER
+   VERSION 2.1.0
+========================================== */
+
+const CACHE_NAME = "midad-global-v2.1";
 
 const APP_FILES = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
+  "./security.js",
   "./manifest.json"
 ];
 
-// INSTALL
+/* INSTALL */
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) =>
-      cache.addAll(APP_FILES)
-    )
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(APP_FILES))
+      .then(() => self.skipWaiting())
   );
-
-  self.skipWaiting();
 });
 
-// ACTIVATE
+/* ACTIVATE */
+
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) =>
-      Promise.all(
-        cacheNames.map((name) => {
-          if (name !== CACHE_NAME) {
-            return caches.delete(name);
-          }
-        })
+    caches.keys()
+      .then((cacheNames) =>
+        Promise.all(
+          cacheNames
+            .filter((name) => name.startsWith("midad-global-") && name !== CACHE_NAME)
+            .map((name) => caches.delete(name))
+        )
       )
-    ).then(() => self.clients.claim())
+      .then(() => self.clients.claim())
   );
 });
 
-// FETCH
-self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
+/* FETCH */
 
-  const requestURL = new URL(event.request.url);
+self.addEventListener("fetch", (event) => {
+  const request = event.request;
+
+  if (request.method !== "GET") return;
+
+  const requestURL = new URL(request.url);
 
   if (requestURL.origin !== self.location.origin) return;
 
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
+    caches.match(request)
+      .then((cachedResponse) => {
+        if (cachedResponse) return cachedResponse;
 
-      return fetch(event.request).then((response) => {
-        if (
-          !response ||
-          response.status !== 200 ||
-          response.type !== "basic"
-        ) {
+        return fetch(request).then((response) => {
+          if (
+            !response ||
+            response.status !== 200 ||
+            response.type !== "basic"
+          ) {
+            return response;
+          }
+
+          const responseCopy = response.clone();
+
+          event.waitUntil(
+            caches.open(CACHE_NAME)
+              .then((cache) => cache.put(request, responseCopy))
+          );
+
           return response;
-        }
-
-        const copy = response.clone();
-
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, copy);
         });
-
-        return response;
-      }).catch(() => {
-        if (event.request.mode === "navigate") {
+      })
+      .catch(() => {
+        if (request.mode === "navigate") {
           return caches.match("./index.html");
         }
 
-        return new Response("Offline - MIDAD", {
+        return new Response("Offline - MIDAD Global Hub", {
           status: 503,
           headers: {
             "Content-Type": "text/plain; charset=utf-8"
           }
         });
-      });
-    })
+      })
   );
 });
