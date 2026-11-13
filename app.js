@@ -152,7 +152,12 @@ function initializeMidad() {
   setLanguage(savedLanguage);
 
   initializeNetworkStatus();
-
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./service-worker.js")
+    .catch(error => {
+      console.error("MIDAD Service Worker:", error);
+    });
+}
   console.info("MIDAD Global Hub initialized.");
 }
 
