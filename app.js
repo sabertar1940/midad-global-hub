@@ -1,344 +1,336 @@
 
 "use strict";
 
-/* =====================================
-   MIDAD GLOBAL HUB - ADVANCED CORE
-===================================== */
+/* ==========================================
+   MIDAD GLOBAL HUB - ADVANCED APPLICATION
+   VERSION 2.0
+========================================== */
 
-const MIDAD = {
-  name: "MIDAD Global Hub",
-  version: "2.0.0",
-  language: "ar",
-  mode: "public",
-  access: "both",
-  initialized: false
-};
+(() => {
 
-/* =====================================
-   MULTI-LANGUAGE SYSTEM
-===================================== */
+  const MIDAD = {
+    name: "MIDAD Global Hub",
+    version: "2.0.0",
+    language: "ar",
+    mode: "public",
+    access: "both",
+    initialized: false
+  };
 
-const translations = {
-  ar: {
-    home: "الرئيسية",
-    explore: "استكشف",
-    community: "المجتمع",
-    knowledge: "المعرفة",
-    privacy: "الخصوصية",
-    settings: "الإعدادات",
-    welcome: "مرحباً بك في MIDAD",
-    description: "منصة عالمية للمعرفة والمجتمع والخصوصية",
-    search: "ابحث هنا...",
-    language: "اللغة"
-  },
+  /* ==========================================
+     MULTI-LANGUAGE SYSTEM
+  ========================================== */
 
-  en: {
-    home: "Home",
-    explore: "Explore",
-    community: "Community",
-    knowledge: "Knowledge",
-    privacy: "Privacy",
-    settings: "Settings",
-    welcome: "Welcome to MIDAD",
-    description: "A global platform for knowledge, community and privacy",
-    search: "Search here...",
-    language: "Language"
-  },
+  const translations = {
 
-  fr: {
-    home: "Accueil",
-    explore: "Explorer",
-    community: "Communauté",
-    knowledge: "Connaissances",
-    privacy: "Confidentialité",
-    settings: "Paramètres",
-    welcome: "Bienvenue sur MIDAD",
-    description: "Une plateforme mondiale pour la connaissance, la communauté et la confidentialité",
-    search: "Rechercher...",
-    language: "Langue"
-  }
-};
+    ar: {
+      home: "الرئيسية",
+      explore: "استكشف",
+      community: "المجتمع",
+      knowledge: "المعرفة",
+      privacy: "الخصوصية",
+      about: "من نحن",
+      contact: "اتصل بنا",
+      login: "تسجيل الدخول",
+      register: "إنشاء حساب",
+      logout: "تسجيل الخروج",
+      search: "بحث",
+      settings: "الإعدادات",
+      profile: "الملف الشخصي",
+      language: "اللغة",
+      welcome: "مرحباً بك في MIDAD",
+      subtitle: "منصة عالمية للمعرفة والتواصل والإبداع",
+      discover: "اكتشف عالماً جديداً من الإمكانيات",
+      start: "ابدأ الآن",
+      services: "خدماتنا",
+      loading: "جاري التحميل...",
+      error: "حدث خطأ، حاول مرة أخرى",
+      success: "تمت العملية بنجاح",
+      footer: "جميع الحقوق محفوظة لـ MIDAD Global Hub"
+    },
 
-/* =====================================
-   LANGUAGE MANAGEMENT
-===================================== */
+    fr: {
+      home: "Accueil",
+      explore: "Explorer",
+      community: "Communauté",
+      knowledge: "Connaissances",
+      privacy: "Confidentialité",
+      about: "À propos",
+      contact: "Contact",
+      login: "Connexion",
+      register: "Créer un compte",
+      logout: "Déconnexion",
+      search: "Rechercher",
+      settings: "Paramètres",
+      profile: "Profil",
+      language: "Langue",
+      welcome: "Bienvenue sur MIDAD",
+      subtitle: "Une plateforme mondiale de connaissance et de créativité",
+      discover: "Découvrez un monde de nouvelles possibilités",
+      start: "Commencer",
+      services: "Nos services",
+      loading: "Chargement...",
+      error: "Une erreur est survenue",
+      success: "Opération réussie",
+      footer: "Tous droits réservés à MIDAD Global Hub"
+    },
 
-function setLanguage(language) {
-  if (!Object.prototype.hasOwnProperty.call(translations, language)) {
-    return false;
-  }
-
-  MIDAD.language = language;
-
-  document.documentElement.lang = language;
-  document.documentElement.dir =
-    language === "ar" ? "rtl" : "ltr";
-
-  document.querySelectorAll("[data-i18n]").forEach(element => {
-    const key = element.dataset.i18n;
-    const translation = translations[language][key];
-
-    if (translation !== undefined) {
-      if (element.hasAttribute("placeholder")) {
-        element.placeholder = translation;
-      } else {
-        element.textContent = translation;
-      }
-    }
-  });
-
-  try {
-    localStorage.setItem("midad-language", language);
-  } catch (error) {
-    console.warn("MIDAD: Language storage unavailable.");
-  }
-
-  return true;
-}
-
-/* =====================================
-   NAVIGATION SYSTEM
-===================================== */
-
-const MIDADNavigation = {
-  currentPage: "home",
-
-  navigate(page) {
-    if (!MIDADSecurity.validatePage(page)) {
-      return false;
+    en: {
+      home: "Home",
+      explore: "Explore",
+      community: "Community",
+      knowledge: "Knowledge",
+      privacy: "Privacy",
+      about: "About Us",
+      contact: "Contact",
+      login: "Login",
+      register: "Create Account",
+      logout: "Logout",
+      search: "Search",
+      settings: "Settings",
+      profile: "Profile",
+      language: "Language",
+      welcome: "Welcome to MIDAD",
+      subtitle: "A global platform for knowledge, communication and creativity",
+      discover: "Discover a world of new possibilities",
+      start: "Get Started",
+      services: "Our Services",
+      loading: "Loading...",
+      error: "An error occurred. Please try again",
+      success: "Operation completed successfully",
+      footer: "All rights reserved to MIDAD Global Hub"
     }
 
-    const target = document.querySelector(
-      `[data-page="${page}"]`
+  };
+
+  /* ==========================================
+     LANGUAGE MANAGEMENT
+  ========================================== */
+
+  function getSavedLanguage() {
+    try {
+      const saved = localStorage.getItem("midad-language");
+
+      return translations[saved] ? saved : "ar";
+
+    } catch (error) {
+      return "ar";
+    }
+  }
+
+  function setLanguage(language) {
+
+    if (!translations[language]) return false;
+
+    MIDAD.language = language;
+
+    const isArabic = language === "ar";
+
+    document.documentElement.lang = language;
+    document.documentElement.dir = isArabic ? "rtl" : "ltr";
+
+    document.body.dir = isArabic ? "rtl" : "ltr";
+
+    try {
+      localStorage.setItem("midad-language", language);
+    } catch (error) {
+      console.warn("MIDAD: Language preference could not be saved.");
+    }
+
+    updateTranslations();
+
+    document.dispatchEvent(
+      new CustomEvent("midad:languageChanged", {
+        detail: { language }
+      })
     );
-
-    if (!target) {
-      console.warn("MIDAD: Page not found:", page);
-      return false;
-    }
-
-    this.currentPage = page;
-
-    document.querySelectorAll("[data-page]").forEach(section => {
-      section.hidden = section !== target;
-    });
-
-    document.querySelectorAll("[data-nav]").forEach(button => {
-      button.classList.toggle(
-        "active",
-        button.dataset.nav === page
-      );
-    });
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
 
     return true;
   }
-};
 
-/* =====================================
-   SECURITY CORE
-===================================== */
+  /* ==========================================
+     TRANSLATION ENGINE
+  ========================================== */
 
-const MIDADSecurity = {
-  initialized: false,
+  function updateTranslations() {
 
-  validatePage(page) {
-    return typeof page === "string" &&
-      /^[a-zA-Z0-9_-]+$/.test(page);
-  },
+    const dictionary = translations[MIDAD.language];
 
-  initialize() {
-    if (this.initialized) return;
+    document.querySelectorAll("[data-i18n]").forEach((element) => {
 
-    this.initialized = true;
+      const key = element.getAttribute("data-i18n");
 
-    console.info("MIDAD Security Core activated.");
-  }
-};
-
-/* =====================================
-   NETWORK STATUS
-===================================== */
-
-function initializeNetworkStatus() {
-  let status = document.getElementById(
-    "midad-network-status"
-  );
-
-  if (status) return;
-
-  status = document.createElement("div");
-  status.id = "midad-network-status";
-
-  status.style.cssText = `
-    position:fixed;
-    bottom:12px;
-    left:12px;
-    padding:9px 15px;
-    border-radius:10px;
-    background:#111b2d;
-    color:#16c7b5;
-    font-size:13px;
-    z-index:9999;
-  `;
-
-  function updateStatus() {
-    status.textContent = navigator.onLine
-      ? "MIDAD • Online"
-      : "MIDAD • Offline";
-
-    status.style.color = navigator.onLine
-      ? "#16c7b5"
-      : "#ffb454";
-  }
-
-  document.body.appendChild(status);
-
-  updateStatus();
-
-  window.addEventListener("online", updateStatus);
-  window.addEventListener("offline", updateStatus);
-}
-
-/* =====================================
-   PROTECTED ELEMENTS
-===================================== */
-
-function initializeProtectedElements() {
-  document.addEventListener("contextmenu", event => {
-    if (event.target.closest("[data-protected]")) {
-      event.preventDefault();
-    }
-  });
-}
-
-/* =====================================
-   NAVIGATION EVENTS
-===================================== */
-
-function initializeNavigation() {
-  document.addEventListener("click", event => {
-    const button = event.target.closest("[data-nav]");
-
-    if (!button) return;
-
-    event.preventDefault();
-
-    MIDADNavigation.navigate(button.dataset.nav);
-  });
-}
-
-/* =====================================
-   LANGUAGE SELECTORS
-===================================== */
-
-function initializeLanguageSelectors() {
-  const selectors = [
-    document.getElementById("language-selector"),
-    document.getElementById("settings-language")
-  ];
-
-  selectors.forEach(selector => {
-    if (!selector) return;
-
-    selector.value = MIDAD.language;
-
-    selector.addEventListener("change", () => {
-      if (setLanguage(selector.value)) {
-        selectors.forEach(other => {
-          if (other) other.value = MIDAD.language;
-        });
+      if (dictionary[key] !== undefined) {
+        element.textContent = dictionary[key];
       }
+
     });
-  });
-}
 
-/* =====================================
-   SERVICE WORKER
-===================================== */
+    document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
 
-function initializeServiceWorker() {
-  if (!("serviceWorker" in navigator)) return;
+      const key = element.getAttribute("data-i18n-placeholder");
 
-  if (
-    location.protocol !== "https:" &&
-    location.hostname !== "localhost" &&
-    location.hostname !== "127.0.0.1"
-  ) {
-    return;
-  }
+      if (dictionary[key] !== undefined) {
+        element.setAttribute("placeholder", dictionary[key]);
+      }
 
-  navigator.serviceWorker.register("./service-worker.js")
-    .then(() => {
-      console.info("MIDAD: Offline service activated.");
-    })
-    .catch(error => {
-      console.error("MIDAD Service Worker:", error);
     });
-}
 
-/* =====================================
-   CORE INITIALIZATION
-===================================== */
+    document.querySelectorAll("[data-i18n-title]").forEach((element) => {
 
-function initializeMidad() {
-  if (MIDAD.initialized) return;
+      const key = element.getAttribute("data-i18n-title");
 
-  MIDAD.initialized = true;
+      if (dictionary[key] !== undefined) {
+        element.setAttribute("title", dictionary[key]);
+      }
 
-  let savedLanguage = "ar";
+    });
 
-  try {
-    savedLanguage =
-      localStorage.getItem("midad-language") || "ar";
-  } catch (error) {
-    console.warn("MIDAD: Storage unavailable.");
+    document.querySelectorAll("[data-i18n-aria]").forEach((element) => {
+
+      const key = element.getAttribute("data-i18n-aria");
+
+      if (dictionary[key] !== undefined) {
+        element.setAttribute("aria-label", dictionary[key]);
+      }
+
+    });
+
   }
 
-  if (!setLanguage(savedLanguage)) {
-    setLanguage("ar");
+  /* ==========================================
+     LANGUAGE SELECTOR
+  ========================================== */
+
+  function initializeLanguageControls() {
+
+    document.addEventListener("change", (event) => {
+
+      if (
+        event.target.matches(
+          "[data-language-selector], #languageSelect"
+        )
+      ) {
+        setLanguage(event.target.value);
+      }
+
+    });
+
+    document.addEventListener("click", (event) => {
+
+      const button = event.target.closest("[data-set-language]");
+
+      if (button) {
+        const language = button.getAttribute("data-set-language");
+        setLanguage(language);
+      }
+
+    });
+
   }
 
-  MIDADSecurity.initialize();
+  /* ==========================================
+     PWA SERVICE WORKER
+  ========================================== */
 
-  initializeNetworkStatus();
-  initializeNavigation();
-  initializeProtectedElements();
-  initializeLanguageSelectors();
-  initializeServiceWorker();
+  async function registerServiceWorker() {
 
-  MIDADNavigation.navigate("home");
+    if (!("serviceWorker" in navigator)) return;
 
-  console.info(
-    "MIDAD Global Hub v" +
-    MIDAD.version +
-    " initialized successfully."
-  );
-}
+    if (
+      location.protocol !== "https:" &&
+      location.hostname !== "localhost" &&
+      location.hostname !== "127.0.0.1"
+    ) {
+      return;
+    }
 
-/* =====================================
-   GLOBAL ACCESS
-===================================== */
+    try {
 
-window.MIDAD = MIDAD;
-window.MIDADNavigation = MIDADNavigation;
-window.MIDADSecurity = MIDADSecurity;
-window.setMidadLanguage = setLanguage;
+      await navigator.serviceWorker.register("./service-worker.js");
 
-/* =====================================
-   START SYSTEM
-===================================== */
+      console.info("MIDAD: Service Worker registered.");
 
-if (document.readyState === "loading") {
-  document.addEventListener(
-    "DOMContentLoaded",
-    initializeMidad,
-    { once: true }
-  );
-} else {
-  initializeMidad();
-}
+    } catch (error) {
+
+      console.error("MIDAD: Service Worker registration failed.", error);
+
+    }
+
+  }
+
+  /* ==========================================
+     APPLICATION INITIALIZATION
+  ========================================== */
+
+  async function initializeMidad() {
+
+    if (MIDAD.initialized) return;
+
+    MIDAD.initialized = true;
+
+    setLanguage(getSavedLanguage());
+
+    initializeLanguageControls();
+
+    await registerServiceWorker();
+
+    document.documentElement.dataset.midad = "initialized";
+
+    document.dispatchEvent(
+      new CustomEvent("midad:ready")
+    );
+
+    console.info("MIDAD Global Hub initialized.");
+
+  }
+
+  /* ==========================================
+     PUBLIC APPLICATION API
+  ========================================== */
+
+  window.MIDAD = {
+
+    name: MIDAD.name,
+
+    version: MIDAD.version,
+
+    get language() {
+      return MIDAD.language;
+    },
+
+    setLanguage,
+
+    getTranslations() {
+      return { ...translations[MIDAD.language] };
+    },
+
+    getStatus() {
+      return {
+        initialized: MIDAD.initialized,
+        language: MIDAD.language,
+        version: MIDAD.version
+      };
+    }
+
+  };
+
+  /* ==========================================
+     APPLICATION START
+  ========================================== */
+
+  if (document.readyState === "loading") {
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      initializeMidad,
+      { once: true }
+    );
+
+  } else {
+
+    initializeMidad();
+
+  }
+
+})();
