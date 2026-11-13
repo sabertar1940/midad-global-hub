@@ -126,3 +126,28 @@ window.setMidadLanguage = setLanguage;
   window.addEventListener("offline", updateStatus);
 
 })();
+
+/* MIDAD NAVIGATION SYSTEM */
+
+const MIDADNavigation = {
+  currentPage: "home",
+
+  navigate(page) {
+    this.currentPage = page;
+
+    document.querySelectorAll("[data-page]").forEach(section => {
+      section.hidden = section.dataset.page !== page;
+    });
+
+    document.querySelectorAll("[data-nav]").forEach(button => {
+      button.classList.toggle(
+        "active",
+        button.dataset.nav === page
+      );
+    });
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+};
+
+window.MIDADNavigation = MIDADNavigation;
