@@ -1,157 +1,176 @@
 
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <meta name="theme-color" content="#080d18">
-  <meta name="description" content="MIDAD Global Hub - منصة عالمية للمعرفة والمجتمع والخصوصية">
-  <meta name="author" content="MIDAD Global Hub">
+  <meta name="description" content="MIDAD Global Hub - منصة عالمية للمعرفة والتواصل والإبداع">
 
   <title>MIDAD Global Hub</title>
 
   <link rel="stylesheet" href="./styles.css">
   <link rel="manifest" href="./manifest.json">
+
   <link rel="icon" href="./favicon.ico">
 </head>
 
 <body>
 
-  <header class="main-header">
-    <a href="#" class="logo" data-nav="home">
-      MIDAD<span> GLOBAL</span>
-    </a>
+  <!-- HEADER -->
 
-    <nav class="main-nav">
-      <button data-nav="home" class="active" data-i18n="home">الرئيسية</button>
-      <button data-nav="explore" data-i18n="explore">استكشف</button>
-      <button data-nav="community" data-i18n="community">المجتمع</button>
-      <button data-nav="knowledge" data-i18n="knowledge">المعرفة</button>
-      <button data-nav="privacy" data-i18n="privacy">الخصوصية</button>
-    </nav>
+  <header class="site-header">
+    <div class="container navbar">
 
-    <div class="header-actions">
-      <select id="language-selector" aria-label="Language">
+      <a href="#" class="logo">MIDAD</a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#home" data-i18n="home">الرئيسية</a></li>
+          <li><a href="#explore" data-i18n="explore">استكشف</a></li>
+          <li><a href="#community" data-i18n="community">المجتمع</a></li>
+          <li><a href="#knowledge" data-i18n="knowledge">المعرفة</a></li>
+          <li><a href="#about" data-i18n="about">من نحن</a></li>
+        </ul>
+      </nav>
+
+      <select id="languageSelect" aria-label="Language">
         <option value="ar">العربية</option>
-        <option value="en">English</option>
         <option value="fr">Français</option>
+        <option value="en">English</option>
       </select>
 
-      <button data-nav="settings" data-i18n="settings">
-        الإعدادات
-      </button>
     </div>
   </header>
 
+  <!-- HERO -->
+
   <main>
 
-    <section data-page="home" class="page-section">
-      <div class="hero">
-        <p class="hero-label">WELCOME TO MIDAD</p>
+    <section class="hero" id="home">
+      <div class="hero-content">
 
         <h1 data-i18n="welcome">
           مرحباً بك في MIDAD
         </h1>
 
-        <p data-i18n="description">
-          منصة عالمية للمعرفة والمجتمع والخصوصية
+        <p data-i18n="subtitle">
+          منصة عالمية للمعرفة والتواصل والإبداع
         </p>
 
-        <div class="hero-actions">
-          <button data-nav="explore">اكتشف المنصة</button>
-          <button data-nav="community">انضم إلى المجتمع</button>
+        <p data-i18n="discover">
+          اكتشف عالماً جديداً من الإمكانيات
+        </p>
+
+        <a href="#explore" class="btn" data-i18n="start">
+          ابدأ الآن
+        </a>
+
+      </div>
+    </section>
+
+    <!-- EXPLORE -->
+
+    <section id="explore">
+      <div class="container">
+
+        <h2 class="section-title" data-i18n="explore">
+          استكشف
+        </h2>
+
+        <p class="section-description" data-i18n="discover">
+          اكتشف عالماً جديداً من الإمكانيات
+        </p>
+
+        <div class="cards-grid">
+
+          <article class="card">
+            <h3>🌍 MIDAD Explore</h3>
+            <p>اكتشف المحتوى والخدمات من مختلف أنحاء العالم.</p>
+          </article>
+
+          <article class="card">
+            <h3>🤝 MIDAD Community</h3>
+            <p>تواصل وتبادل الأفكار والمعرفة مع المجتمع.</p>
+          </article>
+
+          <article class="card">
+            <h3>📚 MIDAD Knowledge</h3>
+            <p>مساحة للتعلم والثقافة وتطوير المهارات.</p>
+          </article>
+
         </div>
-      </div>
 
-      <div class="features-grid">
-        <article class="feature-card">
-          <h2>🌍 استكشف</h2>
-          <p>اكتشف عالماً من المعلومات والأفكار.</p>
-        </article>
-
-        <article class="feature-card">
-          <h2>👥 المجتمع</h2>
-          <p>مساحة للتواصل وتبادل المعرفة.</p>
-        </article>
-
-        <article class="feature-card">
-          <h2>📚 المعرفة</h2>
-          <p>تعلم واكتشف محتوى جديداً.</p>
-        </article>
-
-        <article class="feature-card">
-          <h2>🔒 الخصوصية</h2>
-          <p>إعدادات واضحة لحماية خصوصيتك.</p>
-        </article>
       </div>
     </section>
 
-    <section data-page="explore" class="page-section" hidden>
-      <h1 data-i18n="explore">استكشف</h1>
-      <p>اكتشف محتوى MIDAD.</p>
-      <input type="search" data-i18n="search" placeholder="ابحث هنا...">
+    <!-- COMMUNITY -->
+
+    <section id="community">
+      <div class="container">
+
+        <h2 class="section-title" data-i18n="community">
+          المجتمع
+        </h2>
+
+        <p class="section-description">
+          مساحة للتواصل وتبادل الخبرات والأفكار.
+        </p>
+
+      </div>
     </section>
 
-    <section data-page="community" class="page-section" hidden>
-      <h1 data-i18n="community">المجتمع</h1>
-      <p>مرحباً بك في مجتمع MIDAD.</p>
+    <!-- KNOWLEDGE -->
+
+    <section id="knowledge">
+      <div class="container">
+
+        <h2 class="section-title" data-i18n="knowledge">
+          المعرفة
+        </h2>
+
+        <p class="section-description">
+          المعرفة والإبداع أساس بناء المستقبل.
+        </p>
+
+      </div>
     </section>
 
-    <section data-page="knowledge" class="page-section" hidden>
-      <h1 data-i18n="knowledge">المعرفة</h1>
-      <p>مساحة المعرفة والتعلم والاكتشاف.</p>
-    </section>
+    <!-- ABOUT -->
 
-    <section data-page="privacy" class="page-section" hidden>
-      <h1 data-i18n="privacy">الخصوصية</h1>
-      <p>معلومات وإعدادات الخصوصية.</p>
-    </section>
+    <section id="about">
+      <div class="container">
 
-    <section data-page="settings" class="page-section" hidden>
-      <h1 data-i18n="settings">الإعدادات</h1>
+        <h2 class="section-title" data-i18n="about">
+          من نحن
+        </h2>
 
-      <label for="settings-language">اللغة</label>
+        <p class="section-description">
+          MIDAD Global Hub منصة رقمية تهدف إلى جمع المعرفة
+          والتواصل والإبداع في فضاء عالمي واحد.
+        </p>
 
-      <select id="settings-language">
-        <option value="ar">العربية</option>
-        <option value="en">English</option>
-        <option value="fr">Français</option>
-      </select>
+      </div>
     </section>
 
   </main>
 
-  <footer class="main-footer">
-    <p>© 2026 MIDAD Global Hub</p>
-    <p>Knowledge • Community • Privacy</p>
+  <!-- FOOTER -->
+
+  <footer>
+    <div class="container">
+      <p data-i18n="footer">
+        جميع الحقوق محفوظة لـ MIDAD Global Hub
+      </p>
+    </div>
   </footer>
 
+  <!-- APPLICATION SCRIPTS -->
+
+  <script src="./security.js"></script>
   <script src="./app.js"></script>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const selectors = [
-        document.getElementById("language-selector"),
-        document.getElementById("settings-language")
-      ];
-
-      selectors.forEach(selector => {
-        if (!selector) return;
-
-        selector.value = window.MIDAD?.language || "ar";
-
-        selector.addEventListener("change", () => {
-          if (window.setMidadLanguage) {
-            window.setMidadLanguage(selector.value);
-          }
-
-          selectors.forEach(other => {
-            if (other) other.value = selector.value;
-          });
-        });
-      });
-    });
-  </script>
 
 </body>
 </html>
