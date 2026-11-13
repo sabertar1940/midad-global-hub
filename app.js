@@ -1,21 +1,22 @@
 
 "use strict";
 
-/* =================================
-   MIDAD GLOBAL HUB - CORE SYSTEM
-================================= */
+/* =====================================
+   MIDAD GLOBAL HUB - ADVANCED CORE
+===================================== */
 
 const MIDAD = {
   name: "MIDAD Global Hub",
-  version: "1.0.0",
+  version: "2.0.0",
   language: "ar",
   mode: "public",
-  access: "both"
+  access: "both",
+  initialized: false
 };
 
-/* =================================
+/* =====================================
    MULTI-LANGUAGE SYSTEM
-================================= */
+===================================== */
 
 const translations = {
   ar: {
@@ -58,9 +59,9 @@ const translations = {
   }
 };
 
-/* =================================
+/* =====================================
    LANGUAGE MANAGEMENT
-================================= */
+===================================== */
 
 function setLanguage(language) {
   if (!Object.prototype.hasOwnProperty.call(translations, language)) {
@@ -75,9 +76,14 @@ function setLanguage(language) {
 
   document.querySelectorAll("[data-i18n]").forEach(element => {
     const key = element.dataset.i18n;
+    const translation = translations[language][key];
 
-    if (Object.prototype.hasOwnProperty.call(translations[language], key)) {
-      element.textContent = translations[language][key];
+    if (translation !== undefined) {
+      if (element.hasAttribute("placeholder")) {
+        element.placeholder = translation;
+      } else {
+        element.textContent = translation;
+      }
     }
   });
 
@@ -90,16 +96,15 @@ function setLanguage(language) {
   return true;
 }
 
-/* =================================
+/* =====================================
    NAVIGATION SYSTEM
-================================= */
+===================================== */
 
 const MIDADNavigation = {
   currentPage: "home",
 
   navigate(page) {
     if (!MIDADSecurity.validatePage(page)) {
-      console.warn("MIDAD: Invalid page blocked.");
       return false;
     }
 
@@ -108,14 +113,14 @@ const MIDADNavigation = {
     );
 
     if (!target) {
-      console.warn("MIDAD: Page not found.");
+      console.warn("MIDAD: Page not found:", page);
       return false;
     }
 
     this.currentPage = page;
 
     document.querySelectorAll("[data-page]").forEach(section => {
-      section.hidden = section.dataset.page !== page;
+      section.hidden = section !== target;
     });
 
     document.querySelectorAll("[data-nav]").forEach(button => {
@@ -134,9 +139,9 @@ const MIDADNavigation = {
   }
 };
 
-/* =================================
+/* =====================================
    SECURITY CORE
-================================= */
+===================================== */
 
 const MIDADSecurity = {
   initialized: false,
@@ -155,9 +160,9 @@ const MIDADSecurity = {
   }
 };
 
-/* =================================
+/* =====================================
    NETWORK STATUS
-================================= */
+===================================== */
 
 function initializeNetworkStatus() {
   let status = document.getElementById(
@@ -185,6 +190,10 @@ function initializeNetworkStatus() {
     status.textContent = navigator.onLine
       ? "MIDAD • Online"
       : "MIDAD • Offline";
+
+    status.style.color = navigator.onLine
+      ? "#16c7b5"
+      : "#ffb454";
   }
 
   document.body.appendChild(status);
@@ -195,9 +204,9 @@ function initializeNetworkStatus() {
   window.addEventListener("offline", updateStatus);
 }
 
-/* =================================
+/* =====================================
    PROTECTED ELEMENTS
-================================= */
+===================================== */
 
 function initializeProtectedElements() {
   document.addEventListener("contextmenu", event => {
@@ -207,9 +216,9 @@ function initializeProtectedElements() {
   });
 }
 
-/* =================================
+/* =====================================
    NAVIGATION EVENTS
-================================= */
+===================================== */
 
 function initializeNavigation() {
   document.addEventListener("click", event => {
@@ -223,12 +232,45 @@ function initializeNavigation() {
   });
 }
 
-/* =================================
+/* =====================================
+   LANGUAGE SELECTORS
+===================================== */
+
+function initializeLanguageSelectors() {
+  const selectors = [
+    document.getElementById("language-selector"),
+    document.getElementById("settings-language")
+  ];
+
+  selectors.forEach(selector => {
+    if (!selector) return;
+
+    selector.value = MIDAD.language;
+
+    selector.addEventListener("change", () => {
+      if (setLanguage(selector.value)) {
+        selectors.forEach(other => {
+          if (other) other.value = MIDAD.language;
+        });
+      }
+    });
+  });
+}
+
+/* =====================================
    SERVICE WORKER
-================================= */
+===================================== */
 
 function initializeServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
+
+  if (
+    location.protocol !== "https:" &&
+    location.hostname !== "localhost" &&
+    location.hostname !== "127.0.0.1"
+  ) {
+    return;
+  }
 
   navigator.serviceWorker.register("./service-worker.js")
     .then(() => {
@@ -239,11 +281,15 @@ function initializeServiceWorker() {
     });
 }
 
-/* =================================
+/* =====================================
    CORE INITIALIZATION
-================================= */
+===================================== */
 
 function initializeMidad() {
+  if (MIDAD.initialized) return;
+
+  MIDAD.initialized = true;
+
   let savedLanguage = "ar";
 
   try {
@@ -262,25 +308,30 @@ function initializeMidad() {
   initializeNetworkStatus();
   initializeNavigation();
   initializeProtectedElements();
+  initializeLanguageSelectors();
   initializeServiceWorker();
 
+  MIDADNavigation.navigate("home");
+
   console.info(
-    "MIDAD Global Hub v" + MIDAD.version + " initialized."
+    "MIDAD Global Hub v" +
+    MIDAD.version +
+    " initialized successfully."
   );
 }
 
-/* =================================
+/* =====================================
    GLOBAL ACCESS
-================================= */
+===================================== */
 
 window.MIDAD = MIDAD;
 window.MIDADNavigation = MIDADNavigation;
 window.MIDADSecurity = MIDADSecurity;
 window.setMidadLanguage = setLanguage;
 
-/* =================================
+/* =====================================
    START SYSTEM
-================================= */
+===================================== */
 
 if (document.readyState === "loading") {
   document.addEventListener(
