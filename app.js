@@ -151,3 +151,29 @@ const MIDADNavigation = {
 };
 
 window.MIDADNavigation = MIDADNavigation;
+
+/* MIDAD SECURITY CORE */
+
+(() => {
+  "use strict";
+
+  document.addEventListener("click", event => {
+    const button = event.target.closest("[data-nav]");
+
+    if (!button) return;
+
+    const page = button.dataset.nav;
+
+    if (window.MIDADNavigation) {
+      window.MIDADNavigation.navigate(page);
+    }
+  });
+
+  document.addEventListener("contextmenu", event => {
+    if (event.target.closest("[data-protected]")) {
+      event.preventDefault();
+    }
+  });
+
+  console.log("MIDAD Security Core initialized.");
+})();
