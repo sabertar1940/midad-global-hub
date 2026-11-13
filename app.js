@@ -92,3 +92,37 @@ document.addEventListener("DOMContentLoaded", initializeMidad);
 
 window.MIDAD = MIDAD;
 window.setMidadLanguage = setLanguage;
+// MIDAD Global Hub - Core System
+(() => {
+  "use strict";
+
+  const status = document.createElement("div");
+  status.id = "midad-network-status";
+
+  status.style.cssText = `
+    position:fixed;
+    bottom:12px;
+    left:12px;
+    padding:9px 15px;
+    border-radius:10px;
+    background:#111b2d;
+    color:#16c7b5;
+    font-size:13px;
+    z-index:9999;
+  `;
+
+  function updateStatus() {
+    status.textContent = navigator.onLine
+      ? "MIDAD • Online"
+      : "MIDAD • Offline";
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.body.appendChild(status);
+    updateStatus();
+  });
+
+  window.addEventListener("online", updateStatus);
+  window.addEventListener("offline", updateStatus);
+
+})();
