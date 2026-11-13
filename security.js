@@ -1,35 +1,47 @@
+
 "use strict";
 
-/* MIDAD SECURITY SYSTEM */
+/* MIDAD GLOBAL SECURITY SYSTEM */
 
 const MIDADSecurity = (() => {
 
-  const config = {
+  const config = Object.freeze({
     mode: "public",
     access: "both",
     sessionTimeout: 30 * 60 * 1000
-  };
+  });
+
+  let initialized = false;
 
   function initialize() {
-    console.log("MIDAD Security System Active");
+    if (initialized) return;
+
+    initialized = true;
+
+    console.info("MIDAD Security System Active");
   }
 
   function getSecurityStatus() {
-    return {
-      active: true,
+    return Object.freeze({
+      active: initialized,
       mode: config.mode,
-      access: config.access
-    };
+      access: config.access,
+      sessionTimeout: config.sessionTimeout
+    });
   }
 
-  return {
+  return Object.freeze({
     initialize,
     getSecurityStatus
-  };
+  });
 
 })();
 
-window.MIDADSecurity = MIDADSecurity;
+Object.defineProperty(window, "MIDADSecurity", {
+  value: MIDADSecurity,
+  writable: false,
+  configurable: false
+});
 
 document.addEventListener("DOMContentLoaded", () => {
   MIDADSecurity.initialize();
