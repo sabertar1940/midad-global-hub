@@ -78,7 +78,7 @@ function initializeMidad() {
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
       navigator.serviceWorker
-        .register("./sw.js")
+        .register("./service-worker.js")
         .catch(error => {
           console.error("MIDAD Service Worker:", error);
         });
