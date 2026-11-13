@@ -1,48 +1,52 @@
 
 "use strict";
 
-/* MIDAD GLOBAL SECURITY SYSTEM */
+/* ==========================================
+   MIDAD GLOBAL HUB - SECURITY CORE
+========================================== */
 
-const MIDADSecurity = (() => {
+(() => {
+  const SECURITY = {
+    version: "1.0.0",
+    initialized: false
+  };
 
-  const config = Object.freeze({
-    mode: "public",
-    access: "both",
-    sessionTimeout: 30 * 60 * 1000
-  });
+  // Secure default HTTP headers are configured by the hosting server.
+  // This client-side layer provides basic input safeguards.
 
-  let initialized = false;
-
-  function initialize() {
-    if (initialized) return;
-
-    initialized = true;
-
-    console.info("MIDAD Security System Active");
+  function sanitizeText(value) {
+    const element = document.createElement("div");
+    element.textContent = String(value ?? "");
+    return element.textContent;
   }
 
-  function getSecurityStatus() {
-    return Object.freeze({
-      active: initialized,
-      mode: config.mode,
-      access: config.access,
-      sessionTimeout: config.sessionTimeout
-    });
+  function validateInput(value, maxLength = 500) {
+    if (typeof value !== "string") return false;
+
+    const text = value.trim();
+
+    return (
+      text.length > 0 &&
+      text.length <= maxLength
+    );
   }
 
-  return Object.freeze({
-    initialize,
-    getSecurityStatus
+  function initializeSecurity() {
+    if (SECURITY.initialized) return;
+
+    SECURITY.initialized = true;
+
+    document.documentElement.dataset.security = "initialized";
+
+    console.info("MIDAD Security Core initialized.");
+  }
+
+  window.MIDADSecurity = Object.freeze({
+    version: SECURITY.version,
+    sanitizeText,
+    validateInput,
+    initialize: initializeSecurity
   });
 
+  initializeSecurity();
 })();
-
-Object.defineProperty(window, "MIDADSecurity", {
-  value: MIDADSecurity,
-  writable: false,
-  configurable: false
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  MIDADSecurity.initialize();
-});
