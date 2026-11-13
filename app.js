@@ -196,3 +196,35 @@ if (document.readyState === "loading") {
 } else {
   initializeMidad();
 }
+/* MIDAD SECURITY CORE */
+
+const MIDADSecurity = {
+  initialized: true,
+
+  validatePage(page) {
+    return typeof page === "string" &&
+      /^[a-zA-Z0-9_-]+$/.test(page);
+  },
+
+  protectNavigation() {
+    const originalNavigate = MIDADNavigation.navigate;
+
+    MIDADNavigation.navigate = function(page) {
+      if (!MIDADSecurity.validatePage(page)) {
+        console.warn("MIDAD: Invalid navigation blocked.");
+        return;
+      }
+
+      originalNavigate.call(this, page);
+    };
+  },
+
+  initialize() {
+    this.protectNavigation();
+    console.info("MIDAD Security Core activated.");
+  }
+};
+
+MIDADSecurity.initialize();
+
+window.MIDADSecurity = MIDADSecurity;
