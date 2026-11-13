@@ -1,7 +1,7 @@
 
 "use strict";
 
-/* MIDAD GLOBAL HUB */
+/* MIDAD GLOBAL HUB - CORE SYSTEM */
 
 const MIDAD = {
   name: "MIDAD Global Hub",
@@ -10,6 +10,8 @@ const MIDAD = {
   mode: "public",
   access: "both"
 };
+
+/* MULTI-LANGUAGE SYSTEM */
 
 const translations = {
   ar: {
@@ -44,11 +46,13 @@ const translations = {
     privacy: "Confidentialité",
     settings: "Paramètres",
     welcome: "Bienvenue sur MIDAD",
-    description: "Une plateforme mondiale pour la connaissance et la confidentialité",
+    description: "Une plateforme mondiale pour la connaissance, la communauté et la confidentialité",
     search: "Rechercher...",
     language: "Langue"
   }
 };
+
+/* LANGUAGE MANAGEMENT */
 
 function setLanguage(language) {
   if (!translations[language]) return;
@@ -61,42 +65,50 @@ function setLanguage(language) {
 
   document.querySelectorAll("[data-i18n]").forEach(element => {
     const key = element.dataset.i18n;
-    const value = translations[language][key];
 
-    if (value) element.textContent = value;
+    if (translations[language][key]) {
+      element.textContent = translations[language][key];
+    }
   });
 
-  localStorage.setItem("midad-language", language);
+  try {
+    localStorage.setItem("midad-language", language);
+  } catch (error) {
+    console.warn("MIDAD language storage unavailable");
+  }
 }
 
-function initializeMidad() {
-  const savedLanguage =
-    localStorage.getItem("midad-language") || "ar";
+/* NAVIGATION SYSTEM */
 
-  setLanguage(savedLanguage);
+const MIDADNavigation = {
+  currentPage: "home",
 
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker
-        .register("./service-worker.js")
-        .catch(error => {
-          console.error("MIDAD Service Worker:", error);
-        });
+  navigate(page) {
+    this.currentPage = page;
+
+    document.querySelectorAll("[data-page]").forEach(section => {
+      section.hidden = section.dataset.page !== page;
+    });
+
+    document.querySelectorAll("[data-nav]").forEach(button => {
+      button.classList.toggle(
+        "active",
+        button.dataset.nav === page
+      );
+    });
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
     });
   }
+};
 
-  console.log("MIDAD Global Hub initialized.");
-}
+/* NETWORK STATUS */
 
-document.addEventListener("DOMContentLoaded", initializeMidad);
-
-window.MIDAD = MIDAD;
-window.setMidadLanguage = setLanguage;
-// MIDAD Global Hub - Core System
-(() => {
-  "use strict";
-
+function initializeNetworkStatus() {
   const status = document.createElement("div");
+
   status.id = "midad-network-status";
 
   status.style.cssText = `
@@ -117,63 +129,65 @@ window.setMidadLanguage = setLanguage;
       : "MIDAD • Offline";
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    document.body.appendChild(status);
-    updateStatus();
-  });
+  document.body.appendChild(status);
+
+  updateStatus();
 
   window.addEventListener("online", updateStatus);
   window.addEventListener("offline", updateStatus);
+}
 
-})();
+/* CORE INITIALIZATION */
 
-/* MIDAD NAVIGATION SYSTEM */
+function initializeMidad() {
+  let savedLanguage = "ar";
 
-const MIDADNavigation = {
-  currentPage: "home",
-
-  navigate(page) {
-    this.currentPage = page;
-
-    document.querySelectorAll("[data-page]").forEach(section => {
-      section.hidden = section.dataset.page !== page;
-    });
-
-    document.querySelectorAll("[data-nav]").forEach(button => {
-      button.classList.toggle(
-        "active",
-        button.dataset.nav === page
-      );
-    });
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  try {
+    savedLanguage =
+      localStorage.getItem("midad-language") || "ar";
+  } catch (error) {
+    console.warn("MIDAD storage unavailable");
   }
-};
 
+  setLanguage(savedLanguage);
+
+  initializeNetworkStatus();
+
+  console.info("MIDAD Global Hub initialized.");
+}
+
+/* NAVIGATION EVENTS */
+
+document.addEventListener("click", event => {
+  const button = event.target.closest("[data-nav]");
+
+  if (!button) return;
+
+  MIDADNavigation.navigate(button.dataset.nav);
+});
+
+/* PROTECTED ELEMENTS */
+
+document.addEventListener("contextmenu", event => {
+  if (event.target.closest("[data-protected]")) {
+    event.preventDefault();
+  }
+});
+
+/* GLOBAL ACCESS */
+
+window.MIDAD = MIDAD;
 window.MIDADNavigation = MIDADNavigation;
+window.setMidadLanguage = setLanguage;
 
-/* MIDAD SECURITY CORE */
+/* START */
 
-(() => {
-  "use strict";
-
-  document.addEventListener("click", event => {
-    const button = event.target.closest("[data-nav]");
-
-    if (!button) return;
-
-    const page = button.dataset.nav;
-
-    if (window.MIDADNavigation) {
-      window.MIDADNavigation.navigate(page);
-    }
-  });
-
-  document.addEventListener("contextmenu", event => {
-    if (event.target.closest("[data-protected]")) {
-      event.preventDefault();
-    }
-  });
-
-  console.log("MIDAD Security Core initialized.");
-})();
+if (document.readyState === "loading") {
+  document.addEventListener(
+    "DOMContentLoaded",
+    initializeMidad,
+    { once: true }
+  );
+} else {
+  initializeMidad();
+}
